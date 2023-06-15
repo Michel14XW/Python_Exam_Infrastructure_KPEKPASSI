@@ -26,7 +26,8 @@ pip install gunicorn flask
 # Installer Nginx et mysql
 sudo apt install mysql-server postfix supervisor nginx git -y
 
-
+# Installation de Kubernetes
+curl -sfL https://get.k3s.io | sh -
 
 # Terminé !
 echo "L'installation est terminée."
