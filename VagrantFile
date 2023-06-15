@@ -9,7 +9,18 @@ Vagrant.configure("2") do |config|
       master.vm.box = "ubuntu/focal64"
       master.vm.hostname = "master"
       master.vm.network :private_network, ip: "192.168.148.10"   
-      
+      master.vm.provision :shell, privileged: false, inline: <<-SHELL
+        sudo apt update
+        sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev python3-setuptools -y
+        sudo apt install python3-venv -y
+        mkdir ~/mymasterproject
+        cd mymasterproject/
+        python3 -m venv mymasterprojectenv
+        source mymasterprojectenv/bin/activate
+        pip install wheel
+        pip install gunicorn flask
+        sudo apt install mysql-server postfix supervisor nginx git -y        
+      SHELL
 
     end
   end
