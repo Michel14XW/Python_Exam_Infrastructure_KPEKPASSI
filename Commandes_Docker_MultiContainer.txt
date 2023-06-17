@@ -1,0 +1,28 @@
+# Build microblog a partir du Dockerfile
+
+docker build -t microblog:latest .
+
+
+# Install mysql
+
+docker run --name mysql -d -e MYSQL_RANDOM_ROOT_PASSWORD=yes \
+-e MYSQL_DATABASE=microblog -e MYSQL_USER=microblog \
+-e MYSQL_PASSWORD="root" \
+mysql/mysql-server:latest
+
+# Install Elasticsearch
+
+docker run --name elasticsearch -d -p 9200:9200 -p 9300:9300 --rm \
+    -e "discovery.type=single-node" \
+    docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+
+# Executer microlog en cohesion avec mysql et Elasticsearch
+
+docker run --name microblog -d -p 8000:5000 --rm -e SECRET_KEY=my-secret-key \
+-e MAIL_SERVER=smtp.googlemail.com -e MAIL_PORT=587 -e MAIL_USE_TLS=true \
+-e MAIL_USERNAME="Identifiant_gmail" -e MAIL_PASSWORD="Mot_de_passe_gmail" \
+--link mysql:dbserver \
+-e DATABASE_URL=mysql+pymysql://microblog:"root"@dbserver/microblog \
+--link elasticsearch:elasticsearch \
+-e ELASTICSEARCH_URL=http://elasticsearch:9200 \
+microblog:latest
